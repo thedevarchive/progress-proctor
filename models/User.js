@@ -9,6 +9,7 @@ const UserSchema = new mongoose.Schema({
             type: [
                 {
                     courseName: { type: String, required: true },
+                    progress: {type: Number, required: true, default: 0, min: 0, max: 100}, 
                     modules: [
                         {
                             moduleName: { type: String, required: true },
