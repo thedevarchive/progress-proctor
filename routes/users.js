@@ -21,7 +21,7 @@ router.post("/signup", async (req, res) => {
 
     console.log(hash); 
     // Create new user
-    const newUser = new User({ username, email, hash, courses: [] }); // Hash password in real use
+    const newUser = new User({ username, email, hash }); // Hash password in real use
     await newUser.save();
 
     res.status(201).json({ message: "User created successfully", user: newUser });
