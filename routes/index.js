@@ -81,6 +81,31 @@ router.put("/courses/:id", authenticateToken, async (req, res) => {
   }
 });
 
+router.delete("/courses/:id", authenticateToken, async (req, res) => {
+  try {
+    const user = await User.findById(req.user.userId); // find user (top level)
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const course = user.courses.find(c => c.id === req.params.id); // find course (array inside top level schema User)
+
+    if (!course) {
+      return res.status(404).json({ message: "Course not found" });
+    }
+
+    user.courses = user.courses.filter(course => course._id.toString() !== req.params.id);
+
+    await user.save(); 
+
+    res.status(200).json({ message: "Course deleted"});
+  } catch (err) {
+    console.error("Error deleting course:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
 router.post("/courses/:id/modules", authenticateToken, async (req, res) => {
   const { title } = req.body;
 
