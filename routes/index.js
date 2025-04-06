@@ -31,4 +31,25 @@ router.post("/courses", authenticateToken, async (req, res) => {
   }
 });
 
+router.get("/courses/:id", authenticateToken, async (req, res) => {
+  try {
+    const user = await User.findById(req.user.userId); 
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const course = user.courses.id(req.params.id);
+
+    if (!course) {
+      return res.status(404).json({ message: "Course not found" });
+    }
+
+    res.status(200).json({ message: "Course found", course: course });
+  } catch (err) {
+    console.error("Unable to find course:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
 module.exports = router;
