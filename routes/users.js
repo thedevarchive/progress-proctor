@@ -60,6 +60,7 @@ router.post("/login", async (req, res) => {
 });
 
 router.get("/userinfo", authenticateToken, async (req, res) => {
+  console.log(req.user); 
   try {
     const user = await User.findById(req.user.userId).select("-hash"); // remove sensitive info
     res.json(user);

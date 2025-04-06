@@ -39,7 +39,7 @@ router.get("/courses/:id", authenticateToken, async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    const course = user.courses.id(req.params.id);
+    const course = user.courses.find(c => c.id === req.params.id);
 
     if (!course) {
       return res.status(404).json({ message: "Course not found" });
@@ -48,6 +48,33 @@ router.get("/courses/:id", authenticateToken, async (req, res) => {
     res.status(200).json({ message: "Course found", course: course });
   } catch (err) {
     console.error("Unable to find course:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+router.post("/courses/:id/modules", authenticateToken, async (req, res) => {
+  const { title } = req.body;
+
+  try {
+    const user = await User.findById(req.user.userId); 
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const course = user.courses.find(c => c.id === req.params.id);
+
+    if (!course) {
+      return res.status(404).json({ message: "Course not found" });
+    }
+
+    course.modules.push({ title }); 
+
+    await user.save(); // Save changes to DB
+
+    res.status(201).json({ message: "Module added successfully", modules: course.modules });
+  } catch (err) {
+    console.error("Error adding course:", err);
     res.status(500).json({ message: "Server error" });
   }
 });
