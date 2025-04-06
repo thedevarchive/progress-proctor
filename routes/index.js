@@ -52,6 +52,35 @@ router.get("/courses/:id", authenticateToken, async (req, res) => {
   }
 });
 
+router.put("/courses/:id", authenticateToken, async (req, res) => {
+  const { title, description } = req.body;
+
+  try {
+    const user = await User.findById(req.user.userId); // find user (top level)
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const course = user.courses.find(c => c.id === req.params.id); // find course (array inside top level schema User)
+
+    if (!course) {
+      return res.status(404).json({ message: "Course not found" });
+    }
+
+    // Modify details of course through JavaScript, NOT using mongoose syntax/queries
+    if (title) course.title = title;
+    if (description) course.description = description;
+
+    await user.save(); // Save changes to the user's document
+
+    res.status(200).json({ message: "Course edited successfully", course: course });
+  } catch (err) {
+    console.error("Error editing course:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
 router.post("/courses/:id/modules", authenticateToken, async (req, res) => {
   const { title } = req.body;
 
