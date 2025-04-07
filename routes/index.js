@@ -151,7 +151,6 @@ router.post("/courses/:id/modules", authenticateToken, async (req, res) => {
 });
 
 router.put("/courses/:c_id/modules/:m_id/finished", authenticateToken, async (req, res) => {
-  console.log(req.params);
   try {
     const user = await User.findById(req.user.userId); // find user (top level)
 
@@ -182,6 +181,73 @@ router.put("/courses/:c_id/modules/:m_id/finished", authenticateToken, async (re
     res.status(200).json({ message: "Module completion validated", progress: course.progress }); //only return course to update progress bar
   } catch (err) {
     console.error("Error editing module:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+router.put("/courses/:c_id/modules/:m_id/title", authenticateToken, async (req, res) => {
+  const { title } = req.body;
+  try {
+    const user = await User.findById(req.user.userId); // find user (top level)
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const course = user.courses.find(c => c.id === req.params.c_id); // find course (array inside top level schema User)
+
+    if (!course) {
+      return res.status(404).json({ message: "Course not found" });
+    }
+
+    const module = course.modules.find(c => c.id === req.params.m_id); // find module (not top level so also use find)
+
+    if (!module) {
+      return res.status(404).json({ message: "Course not found" });
+    }
+
+    // Modify title of module
+    module.title = title; 
+
+    await user.save(); // Save changes to the user's document
+
+    res.status(200).json({ message: "Module updated", updateModule: module }); //only return course to update progress bar
+  } catch (err) {
+    console.error("Error editing module:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+router.delete("/courses/:c_id/modules/:m_id", authenticateToken, async (req, res) => {
+  try {
+    const user = await User.findById(req.user.userId); // find user (top level)
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const course = user.courses.find(c => c.id === req.params.c_id); // find course (array inside top level schema User)
+
+    if (!course) {
+      return res.status(404).json({ message: "Course not found" });
+    }
+
+    const module = course.modules.find(m => m.id === req.params.m_id); // find module (not top level so also use find)
+
+    if (!module) {
+      return res.status(404).json({ message: "Course not found" });
+    }
+
+    course.modules = course.modules.filter(module => module._id.toString() !== req.params.m_id);
+
+    await user.save();
+
+    await updateProgress(course); // update course progress
+    await user.save(); // Save changes to progress after 
+
+    res.status(200).json({ message: "Module deleted", progress: course.progress, modules: course.modules });
+  } catch (err) {
+    console.error("Error deleting course:", err);
     res.status(500).json({ message: "Server error" });
   }
 });
