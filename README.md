@@ -2,7 +2,7 @@
 
 *"The journey of a thousand lines of code begins with a single 'Hello World'."*
 
-Server for the app ![CodeProctor](https://github.com/thedevarchive/code-proctor/tree/main).
+Server for the app [CodeProctor](https://github.com/thedevarchive/code-proctor/tree/main).
 
 This project was made so that I can get started on learning MERN with MongoDB instead of MySQL (finally). 
 
