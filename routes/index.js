@@ -10,7 +10,7 @@ router.get('/', function (req, res, next) {
 });
 
 router.post("/courses", authenticateToken, async (req, res) => {
-  const { title } = req.body;
+  const { title, courseType } = req.body;
 
   try {
     const user = await User.findById(req.user.userId);
@@ -20,7 +20,7 @@ router.post("/courses", authenticateToken, async (req, res) => {
     }
 
     // Add new course to user's courses array
-    user.courses.push({ title });
+    user.courses.push({ title, courseType });
 
     await user.save(); // Save changes to DB
 
