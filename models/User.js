@@ -14,6 +14,7 @@ const CourseSchema = new mongoose.Schema({
         min: 0,
         max: 100,
     },
+    courseType: {type: String, required: true},
     // Add whatever else you want here
     modules: [ModuleSchema]
 });
