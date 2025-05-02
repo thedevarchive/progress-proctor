@@ -9,6 +9,7 @@ router.get('/', function (req, res, next) {
   res.render('index', { title: 'Express' });
 });
 
+//gets the courses of the user currently logged in
 router.post("/courses", authenticateToken, async (req, res) => {
   const { title, courseType } = req.body;
 
